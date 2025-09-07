@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>title</title>
+    <style>
+        body {
+            background-color: black;/* #333; Dark grey background */
+            color: white; /* White text color for contrast */
+            font-family: Arial, sans-serif;
+            display: flex;
+        }
+
+        h1 {
+            color: white;
+        }
+
+        button {
+            background-color: #444; /* Slightly lighter grey for buttons */
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #555; /* Lighter grey when hovered */
+        }
+
+        select, input {
+            background-color: #444;
+            color: white;
+            border: 1px solid #555;
+            padding: 5px;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #888;
+        }
+
+#db-gallery {
+    padding: 2px;
+    display: flex;
+    flex-direction: column; /* Stack images vertically */
+    gap: 10px; /* Space between images */
+    width: auto;  
+    height: auto;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+#db-gallery img {
+     height: 100px; /* Maintain aspect ratio */
+}
+
+#matched-faces {
+    padding: 1px;
+    width: auto;
+    height: auto;
+    overflow-x: hidden;
+    display: flex;  
+    flex-direction: column;  /* Stacks divs vertically */
+    gap: 10px;  /* Space between each div */
+}
+        #matched-faces img{
+            height:50px;
+            padding-bottom: 0px;
+        }
+        .container.expanded #matched-faces img{
+            height: 70px;
+        }
+        .container.expanded #matched-faces{
+            margin-top: 5px;
+        }
+        .matched-faces-box{
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .matched-faces-box button{
+            height: 35px;
+        }
+
+        .face-card{
+            gap: 2px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+.face-card-text p{
+            font-size: 12px;
+            align-items: top;
+            justify-content: top;
+    margin: 0; 
+    padding: 0; 
+}
+        .right_side{
+            margin-left: 40px;
+        }
+        .left_side{
+            font-size: 14px;
+            height: 97vh; /* Adjust this as needed for your desired height */
+            overflow-y: scroll; /* Adds a vertical scrollbar if content exceeds height */
+            overflow-x: hidden; /* Prevents horizontal scrolling */
+        }
+        .left_side::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+   .container {
+        border: 2px solid #444;
+        background-color: black;
+        border-radius: 10px;
+    }
+    .header-box {
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        background-color:#444;
+        display: flex;
+        justify-content: space-around;
+        border-bottom: 1px solid black;    
+    }
+    .header-box button{
+        width: 760px;
+    }
+    .container.expanded .header-box {
+        border-radius: 0;
+    }
+ 
+.container {
+    position: relative; /* Normal state */
+    width: 260px; 
+    height: 390px;
+/*    transition: all 0.3s ease-in-out;*/
+}
+.container.expanded {
+    position: fixed; /* Covers the screen */
+    top: 0px;
+    left: 0px;
+    width: 99.81vw;
+    height: 99.5vh;
+    background: rgba(0, 0, 0, 0.9); /* Dark overlay effect */
+    z-index: 9999;
+    padding: 0px;
+    overflow-y: auto; /* Enable scrolling if needed */
+    border-radius: 0px;
+    border: 0px;
+}
+/* Hide close button by default */
+.close-btn {
+    display: none;
+    position: absolute;
+    top: 0px;
+    right: 10px;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+/* Show close button only when expanded */
+.container.expanded .close-btn {
+    display: block;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+}
+.content-box {
+    flex-grow: 1; /* Allow it to take available space */
+    overflow-y: auto; /* Add scrolling if needed */
+}
+.container-buttons {
+    margin-top: auto; /* Push it to the bottom */
+    text-align: center; /* Center the buttons */
+    padding: 10px;
+    background: white; /* Optional: Background for better visibility */
+}
+
+#search_faces {
+    width: 200px; /* Adjust width as needed */
+    padding: 5px;
+    font-size: 12px;
+    border-radius: 5px;
+}
+.continer-buttons {
+/*    background-color: darkgray;*/
+    font-size: 12px; /* Adjust as needed */
+/*    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;*/
+}
+.continer-buttons span, 
+.continer-buttons > text {
+    font-size: 11px; /* Adjust as needed */
+}
+
+p {
+    white-space: pre-line;
+}
+
+#container-options {
+    display: none;
+}
+/* Show checkboxes only when expanded */
+.container.expanded #container-options {
+    margin: 1px;
+    display: block;
+}
+#container-options2{
+    display: flex;
+}
+.container.expanded #container-options2{
+    display:none;
+}
+
+#container-options2 {
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+/*    align-items: center; /* Center align */*/
+}
+#expand_matched_faces2 {
+    width:260px;
+    margin-bottom: 0px; /* Add spacing between button and spans */
+}
+#matches-database {
+    font-size: 12px;
+/*    text-align: center;*/
+    margin-top: auto; /* Push it to the bottom */
+    margin-bottom: 1px;
+}
+ 
+.container:not(.expanded) .db-options {
+    display: none;
+}
+
+.file-input {
+    width: 70px;   /* adjust size */
+    height: 17px;   /* adjust height */
+    font-size: 11px;
+    padding: 0px 0px;
+    margin-top: 2px;
+}
+.file-submit {
+    width: 60px;   /* adjust size */
+    height: 18.5px;   /* adjust height */
+    font-size: 11px;
+    padding: 0px 0px;
+    /*margin-top: 2px;*/
+}
+
+</style>
+</head>
+<body>
+
+<div class="left_side">
+    <!-- <h3>HUMAN DETECTION AND FACE RECOGNITION</h3>      -->
+<form action="/" method="get">
+<label>Enter youtube url:</label><br>     
+<input type="text" id="vidurl" name="vidurl" placeholder="Paste YouTube link" /><br>
+<label>Select video source:</label><br>
+<select name="source" id="source" style="width:175px;">
+    <option value="none" selected >none</option>
+    <option value="Webcam">Webcam</option>
+    {% for video_file in video_files %}
+        <option value="{{ video_file }}">{{ video_file }}</option>
+    {% endfor %}
+</select>
+<input type="submit" value="▶/↻" onclick="playVideo()" style=" padding: 0px;border-radius: 10px; margin-top: 2px; height:28px; width: 66.5px; font-size: 18px;">
+</form>
+  <form method="POST" enctype="multipart/form-data">
+    <label for="source">Upload video:</label>
+    {{form.hidden_tag()}}
+    {{ form.file(class="file-input") }}    
+    {{form.submit(class="file-submit")}}    
+  </form>
+<br>
+<button id="toggleHumanDetection" onclick="toggleHumanDetection()">Toggle Person Detection</button>
+<span id="detectionStatus" style="margin-right: 10px; font-weight: bold;">Status:-inv-</span><br>
+<!-- Add this inside the <body> of your index.html -->
+<button id="autoDetectToggle" onclick="toggleAutoDetect()">Toggle Face Detection</button>
+<span id="autoDetectStatus" style="margin-right: 10px; font-weight: bold;">Status:-inv-</span><br>
+<!-- Add this inside the <body> of your index.html -->
+<button id="autoSaveFacesToggle" onclick="toggleAutoSaveFaces()">Toggle Auto Save Faces</button>
+<span id="autoSaveFacesStatus" style="margin-right: 10px; font-weight: bold;">Status:-inv-</span>
+<br>
+<br>
+        <label>Seek to Time (hr : min : sec):</label>
+        <br>
+        <input type="number" id="hours" min="0" placeholder="hr" style="width: 50px; border-radius: 5px;">
+        <input type="number" id="minutes" min="0" max="59" placeholder="min" style="width: 50px;  border-radius: 5px;">
+        <input type="number" id="seconds" min="0" max="59" placeholder="sec" style="width: 50px;  border-radius: 5px;">
+        <button onclick="seekToTime()">go</button>
+        <br>
+        <button onclick="superRewind()"><<<</button>
+        <button onclick="rewind()"><<</button>
+        <button id="pauseButton" onclick="togglePause()">Play/Pause -inv-</button>
+        <button onclick="fastForward()">>></button>
+        <button onclick="superFastForward()">>>></button>
+        <button id="fullscreenButton" onclick="toggleFullscreen()">⛶</button>
+        <br>
+        <br>
+
+<div class="container">
+    <!-- Header Box -->
+    <div class="header-box">
+        <button id="tab-matches" onclick="showSection('matched-faces')">MATCHES FOUND</button>
+        <button id="tab-db" onclick="showSection('db-gallery')">FACE DATABASE</button>
+    </div>
+    <!-- Content Box -->
+    <div class="content-box">
+    <span class="close-btn" onclick="expand_matched_faces()">✖</span>
+
+<div id="db-gallery" style="display: none;">
+    {% for image in images %}
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span>{{ loop.index }}.</span> <!-- Add numbering -->
+            <img src="{{ url_for('send_image', filename=image.filename) }}" alt="{{ image.name }}" height="100">
+            <p style="margin: 0;">Name: <span id="name-{{ loop.index }}">{{ image.name }}</span></p>
+
+            <!-- Rename Input & Button -->
+<input class="db-options" type="text" id="rename-input-{{ loop.index }}" placeholder="Edit name"
+  style="font-size: 12px; padding: 4px 8px; width: 100px; border-radius: 5px;"
+  onfocus="disableKeyListeners()"
+  onblur="enableKeyListeners()">
+<button class="db-options" 
+  style="font-size: 12px; padding: 4px 8px;"
+  onclick="renameImage('{{ image.filename }}', {{ loop.index }})">Rename</button>
+<button class="db-options"
+  style="font-size: 12px; padding: 4px 8px;"
+  onclick="deleteImage('{{ image.filename }}', {{ loop.index }})">Delete</button>
+        </div>
+    {% endfor %}
+</div>
+
+    <div id="matched-faces"></div>
+    </div>
+    <div id="container-options">
+        <div class="continer-buttons">
+            <button id="expand_matched_faces" onclick="expand_matched_faces()">Collapse Region</button>
+            <input type="text" id="search_faces" placeholder="Search" 
+                onfocus="disableKeyListeners(); disableFetchInterval()" 
+                onblur="enableKeyListeners(); enableFetchInterval()" 
+                oninput="searchFaces()">        
+            Matches (<span id="matched-count">0</span>)
+            Database (<span id="db-count">0</span>)
+            </button>
+            <label>
+                <input type="checkbox" id="show_unknown" onchange="toggleCheckbox('show_unknown')"> Show unknown faces only
+            </label>
+            <label>
+                <input type="checkbox" id="show_known" onchange="toggleCheckbox('show_known')"> Hide unknown faces
+            </label>
+            <button id="clear_matched_faces" onclick="clear_matched_faces()">Clear Matches</button>  
+        </div>
+    </div> 
+<div id="container-options2">
+    <div id="matches-database">
+        Matches (<span style="font-size:11px" id="matched-count2">0</span>)
+        Database (<span style="font-size:11px" id="db-count2">0</span>)
+    </div>
+    <button id="expand_matched_faces2" onclick="expand_matched_faces()">Expand Region (more options)</button>
+</div>
+</div>
+</div>
+
+<div class="right_side">
+    {%if request.args.get('source') %}
+        <!-- <p><strong>Selected Model:</strong> {{ request.args.get('model') }}</p> -->
+        <!-- <p><strong>Selected Video Source:</strong> {{ request.args.get('source') }}</p> -->
+        <br>
+            <div style="position: relative; display: inline-block;">
+            <img id="videoFeed" src="{{ url_for('video_feed', source=request.args.get('source'), vidurl=request.args.get('vidurl')) }}" 
+             width="1200px" height="675px" >
+            <canvas id="roiCanvas"></canvas>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+
+// Rename Image
+function renameImage(oldFilename, index) {
+    let newName = document.getElementById(`rename-input-${index}`).value.trim();
+    
+    if (newName === "") {
+        alert("Enter a valid name.");
+        return;
+    }
+    fetch('/rename_image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ oldFilename: oldFilename, newFilename: newName + ".jpg" })
+    }).then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              document.getElementById(`name-${index}`).textContent = newName;
+              alert("Image renamed successfully!");
+          } else {
+              alert("Failed to rename image.");
+          }
+      });
+}
+// Delete Image
+function deleteImage(filename, index) {
+    if (!confirm("Are you sure you want to delete this image?")) return;
+
+    fetch('/delete_image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: filename })
+    }).then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              let nameElement = document.getElementById(`name-${index}`);
+              if (nameElement) {
+                  nameElement.textContent = "-This item has been deleted-";
+              } else {
+                  console.error(`Element with id name-${index} not found.`);
+              }
+          } else {
+              alert("Failed to delete image.");
+          }
+      }).catch(error => console.error("Fetch error:", error));
+}
+
+function filterImages() {
+    let showUnknown = document.getElementById('show_unknown').checked;
+    let showKnown = document.getElementById('show_known').checked;
+
+    document.querySelectorAll('#db-gallery div').forEach(item => {
+        let name = item.querySelector('p').innerText; // Get name from <p>
+        let isUnknown = name.startsWith("Name: unknown_");
+        // Default: Show all images if no filters are selected
+        if (!showUnknown && !showKnown) {
+            item.style.display = "flex";
+            return;
+        }
+        // If both are checked, show everything
+        if (showUnknown && showKnown) {
+            item.style.display = "flex";
+            return;
+        }
+        // Filtering logic
+        if (showUnknown && isUnknown) {
+            item.style.display = "flex";
+        } else if (showKnown && !isUnknown) {
+            item.style.display = "flex";
+        } else {
+            item.style.display = "none";
+        }
+    });
+    document.querySelectorAll('#matched-faces .face-card').forEach(item2 => {
+        let name = item2.querySelector('p').innerText; // Get name from <p>
+        let isUnknown = name.startsWith("Name: unknown_");
+        // Default: Show all images if no filters are selected
+        if (!showUnknown && !showKnown) {
+            item2.style.display = "flex";
+            return;
+        }
+        // If both are checked, show everything
+        if (showUnknown && showKnown) {
+            item2.style.display = "flex";
+            return;
+        }
+        // Filtering logic
+        if (showUnknown && isUnknown) {
+            item2.style.display = "flex";
+        } else if (showKnown && !isUnknown) {
+            item2.style.display = "flex";
+        } else {
+            item2.style.display = "none";
+        }
+    });
+}
+function toggleCheckbox(clickedId) {
+    let unknownCheckbox = document.getElementById('show_unknown');
+    let knownCheckbox = document.getElementById('show_known');
+
+    // If one is checked, uncheck the other
+    if (clickedId === 'show_unknown' && unknownCheckbox.checked) {
+        knownCheckbox.checked = false;
+    } else if (clickedId === 'show_known' && knownCheckbox.checked) {
+        unknownCheckbox.checked = false;
+    }
+
+    // saveCheckboxState(); // Save new state
+    filterImages(); // Apply filtering
+}
+
+function updateFaceCounts() {
+    // Count face-card divs inside #matched-faces
+    const matchedFacesDiv = document.getElementById("matched-faces");
+    const matchedCount = matchedFacesDiv ? matchedFacesDiv.querySelectorAll(".face-card").length : 0;
+
+    // Count direct divs inside #db-gallery
+    const dbGalleryDiv = document.getElementById("db-gallery");
+    const dbCount = dbGalleryDiv ? dbGalleryDiv.querySelectorAll(":scope > div").length : 0;
+
+    console.log(`Matched Faces: ${matchedCount}, DB Gallery: ${dbCount}`);
+
+    // Update counts on UI
+    document.getElementById("matched-count").textContent = matchedCount;
+    document.getElementById("db-count").textContent = dbCount;
+    // Update counts on UI
+    document.getElementById("matched-count2").textContent = matchedCount;
+    document.getElementById("db-count2").textContent = dbCount;
+}
+// Observer to detect changes in matched-faces and db-gallery
+const observer = new MutationObserver(updateFaceCounts);
+const matchedFacesDiv = document.getElementById("matched-faces");
+const dbGalleryDiv = document.getElementById("db-gallery");
+// Start observing both sections
+if (matchedFacesDiv) observer.observe(matchedFacesDiv, { childList: true });
+if (dbGalleryDiv) observer.observe(dbGalleryDiv, { childList: true });
+// Run once to initialize
+updateFaceCounts();
+
+function searchFaces() {
+    let input = document.getElementById('search_faces').value.toLowerCase();
+    // Search in Matched Faces
+    let matchedFaces = document.querySelectorAll('#matched-faces .face-card');
+    matchedFaces.forEach(face => {
+        let name = face.querySelector("p").textContent.toLowerCase();
+        face.style.display = name.includes(input) ? "flex" : "none";
+    });
+    // Search in DB Gallery
+    let dbImages = document.querySelectorAll('#db-gallery div');
+    dbImages.forEach(image => {
+        let name = image.querySelector("p").textContent.toLowerCase();
+        image.style.display = name.includes(input) ? "flex" : "none";
+    });
+}
+function keyPressHandler(event) {
+    if (event.code === "Space") {
+        event.preventDefault(); // Prevent page scroll behavior when pressing space
+        togglePause();
+    }
+    if (event.code === "KeyF") {
+        event.preventDefault(); // Prevent default browser fullscreen
+        toggleFullscreen();
+    }
+}
+// Attach event listener when the page loads
+window.addEventListener("keydown", keyPressHandler);
+// Function to disable key event listener
+function disableKeyListeners() {
+    window.removeEventListener("keydown", keyPressHandler);
+}
+// Function to re-enable key event listener
+function enableKeyListeners() {
+    window.addEventListener("keydown", keyPressHandler);
+}
+function disableFetchInterval() {
+    clearInterval(fetchInterval);
+}
+function enableFetchInterval() {
+    fetchInterval = setInterval(fetchMatchedFaces, 500);
+}
+
+function expand_matched_faces() {
+    const container = document.querySelector(".container");
+
+    if (container.classList.contains("expanded")) {
+        container.classList.remove("expanded"); // Collapse
+        localStorage.setItem("isExpanded", "false");
+    } else {
+        container.classList.add("expanded"); // Expand
+        localStorage.setItem("isExpanded", "true");
+    }
+}
+// Restore state on page load
+document.addEventListener("DOMContentLoaded", function () {
+    const container = document.querySelector(".container");
+    if (localStorage.getItem("isExpanded") === "true") {
+        container.classList.add("expanded");
+    }
+});
+window.addEventListener("keydown", function(event){
+    if (event.code === "Escape"){
+        const container = document.querySelector(".container");
+        if (container.classList.contains("expanded")) {
+            container.classList.remove("expanded");
+            localStorage.setItem("isExpanded", "false");
+        }
+    }
+});
+
+function showSection(sectionId) {
+    // Store the selected section in localStorage
+    localStorage.setItem("lastSection", sectionId);
+    // Show the correct section
+    document.getElementById('db-gallery').style.display = (sectionId === 'db-gallery') ? 'flex' : 'none';
+    document.getElementById('matched-faces').style.display = (sectionId === 'matched-faces') ? 'flex' : 'none';
+    // Highlight active tab
+    // document.getElementById('tab-db').classList.toggle('active', sectionId === 'db-gallery');
+    // document.getElementById('tab-matches').classList.toggle('active', sectionId === 'matched-faces');
+}
+// Restore last opened section on page load
+document.addEventListener("DOMContentLoaded", function () {
+    const lastSection = localStorage.getItem("lastSection") || "matched-faces"; // Default to "matched-faces"
+    showSection(lastSection);
+});
+
+let lastFetchedData = JSON.stringify([]); // Store the last fetched data as a string
+
+function fetchMatchedFaces() {
+    fetch('/matched_faces')
+        .then(response => response.json())
+        .then(data => {
+            const newDataString = JSON.stringify(data); // Convert new data to string for comparison
+
+            if (newDataString === lastFetchedData) {
+                return; // Exit if data hasn't changed
+            }
+
+            lastFetchedData = newDataString; // Update the last fetched data
+
+            const facesContainer = document.getElementById("matched-faces");
+            facesContainer.innerHTML = ""; // Clear old data
+
+            data.forEach((face, index) => {
+                const faceCard = document.createElement("div");
+                faceCard.classList.add("face-card");
+
+                const faceCardText = document.createElement("div");
+                faceCardText.classList.add("face-card-text");
+
+                const numbering = document.createElement("span");
+                numbering.textContent = `${index + 1}. `; // Add numbering before images
+                // numbering.style.fontWeight = "bold"; // Optional: Make it bold
+                numbering.style.display = "flex"; // Ensure it behaves like a block
+                numbering.style.alignItems = "center"; // Center text vertically
+                numbering.style.justifyContent = "center"; // Center horizontally if needed
+                // numbering.style.minWidth = "30px"; // Keep numbers aligned properly
+
+                const img1 = document.createElement("img");
+                img1.style.marginRight = "8px"; // space after img1
+                img1.src = face.img_url1;
+                img1.alt = face.name;
+
+                const img2 = document.createElement("img");
+                img2.src = face.img_url2;
+                img2.alt = face.name;
+
+                const img3 = document.createElement("img");
+                img3.src = face.img_url3;
+                img3.alt = face.name;
+
+                const infoTag = document.createElement("p");
+                infoTag.textContent = `Name: ${face.name}\nSource: ${face.video_source_name}\n${face.time_stamp}`;
+
+                // Append elements
+                faceCard.appendChild(numbering); // Add numbering before name
+                faceCardText.appendChild(infoTag);
+                faceCard.appendChild(img2);
+                faceCard.appendChild(img1);
+                faceCard.appendChild(img3);
+                faceCard.appendChild(faceCardText);
+
+                facesContainer.appendChild(faceCard);
+            });
+
+            // Update matched count
+            document.getElementById("matched-count").innerText = data.length;
+        })
+        .catch(error => console.error("Error fetching matched faces:", error));
+}
+// setInterval(fetchMatchedFaces, 500); // Update matched faces every 500ms (0.5 seconds)
+let fetchInterval; // Holds setInterval ID
+function startFetching() {
+    fetchInterval = setInterval(fetchMatchedFaces, 500);
+}
+// Call this to start the interval when ready
+startFetching();
+
+        function togglePause() {
+            fetch("/toggle_pause", { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    const btn = document.getElementById("pauseButton");
+                    btn.textContent = data.paused ? "▶" : "❚❚";
+                });
+        }  
+        function playVideo() {
+            fetch("/play_video", { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    const btn = document.getElementById("pauseButton");
+                    btn.textContent = data.paused ? "▶" : "❚❚";
+                });
+        }  
+
+        function displayPause() {
+            fetch("/display_pause", { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    const btn = document.getElementById("pauseButton");
+                    btn.textContent = data.paused ? "▶" : "❚❚";
+                });
+        }
+        displayPause()
+        
+        function toggleFullscreen() { 
+            const videoElement = document.getElementById("videoFeed");
+            const videoElement2 = document.getElementById("roiCanvas");
+            if (!document.fullscreenElement) {
+                videoElement.requestFullscreen().catch(err => {
+                    console.log("Error attempting to enable full-screen mode:", err);
+                });
+                videoElement2.requestFullscreen().catch(err => {
+                    console.log("Error attempting to enable full-screen mode:", err);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function toggleAutoDetect() {
+        fetch('/toggle_auto_detect', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                const status = data.auto_detect ? "ON" : "OFF";
+                // Update the status display
+                document.getElementById('autoDetectStatus').textContent = `${status}`;
+            });
+        }
+        function displayAutoDetect() {
+        fetch('/display_auto_detect', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                const status = data.auto_detect ? "ON" : "OFF";
+                // Update the status display
+                document.getElementById('autoDetectStatus').textContent = `${status}`;
+            });
+        }
+        displayAutoDetect()
+
+function toggleAutoSaveFaces() {
+    fetch('/toggle_auto_save_faces', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            const statusText = data.auto_save_faces ? "ON" : "OFF";
+            document.getElementById('autoSaveFacesStatus').textContent = `${statusText}`;
+        })
+        .catch(error => console.error('Error toggling auto save:', error));
+}
+function displayAutoSaveFaces() {
+    fetch('/display_auto_save_faces', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            const statusText = data.auto_save_faces ? "ON" : "OFF";
+            document.getElementById('autoSaveFacesStatus').textContent = `${statusText}`;
+        })
+        .catch(error => console.error('Error toggling auto save:', error));
+}
+displayAutoSaveFaces()
+
+function toggleHumanDetection() {
+    fetch('/toggle_human_detection', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+        document.getElementById("detectionStatus").textContent = data.human_detection_enabled ? "ON" : "OFF";
+         });
+}
+function displayHumanDetection() {
+    fetch('/display_human_detection', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+        document.getElementById("detectionStatus").textContent = data.human_detection_enabled ? "ON" : "OFF";
+         });
+}
+displayHumanDetection()
+
+// Fast forward by skipping 60 frames
+function fastForward() {
+    fetch('/seek', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'fastforward', frames: 120 })
+    });
+}
+// Rewind by skipping back 60 frames
+function rewind() {
+    fetch('/seek', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'rewind', frames: 60 })
+    });
+}
+
+// Fast forward by skipping 60 frames
+function superFastForward() {
+    fetch('/seek', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'fastforward', frames: 1200 })
+    });
+}
+// Rewind by skipping back 60 frames
+function superRewind() {
+    fetch('/seek', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'rewind', frames: 600 })
+    });
+}
+
+function clear_matched_faces() {
+    fetch("/clear_matched_faces", { method: "POST" })
+        .then(response => response.json());
+}
+
+function seekToTime() {
+    const hours = parseInt(document.getElementById("hours").value) || 0;
+    const minutes = parseInt(document.getElementById("minutes").value) || 0;
+    const seconds = parseInt(document.getElementById("seconds").value) || 0;
+    const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+
+    playVideo();
+    
+    fetch('/seek', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ time: totalSeconds })
+    });
+}
+        const img = document.getElementById('videoFeed');
+        const canvas = document.getElementById('roiCanvas');
+        const ctx = canvas.getContext('2d');
+        let startX, startY, endX, endY, isDrawing = false;
+
+        function updateCanvasSize() {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            canvas.style.left = img.offsetLeft + 'px';
+            canvas.style.top = img.offsetTop + 'px';
+        }
+
+        img.onload = updateCanvasSize;
+        window.onresize = updateCanvasSize;
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            startX = e.offsetX;
+            startY = e.offsetY;
+            endX = e.offsetX;
+            endY = e.offsetY;
+
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDrawing) return;
+            endX = e.offsetX;
+            endY = e.offsetY;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(startX, startY, endX - startX, endY - startY);
+        });
+
+canvas.addEventListener('mouseup', () => {
+    isDrawing = false;
+    // Calculate width & height of drawn rectangle
+    const width = Math.abs(endX - startX);
+    const height = Math.abs(endY - startY);
+    // Skip processing if the drawn region is too small (e.g., less than 5x5 pixels)
+    if (width < 10 || height < 10){
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        return;
+    }
+    sendROI(startX, startY, endX, endY);
+    // ctx.clearRect(0, 0, canvas.width, canvas.height);
+});
+
+        function sendROI(x1, y1, x2, y2) {
+            console.log(x1,y1,x2,y2);
+            fetch('/set_roi', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ x1, y1, x2, y2 })
+            }).then(response => response.json())
+              .then(data => console.log('ROI Set:', data));
+        }       
+
+    </script>
+</body>
+</html>
