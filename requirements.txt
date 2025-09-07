@@ -1,0 +1,5 @@
+opencv-python
+flask
+ultralytics
+torch
+face_recognition
