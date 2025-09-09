@@ -3,3 +3,7 @@ flask
 ultralytics
 torch
 face_recognition
+
+
+**note: if face_recognition does not install then try this method:
+-> dlib-19.22.99-cp38-cp38-win_amd64.whl - download this file, keep it in project directory and pip install it
